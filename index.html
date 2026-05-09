@@ -402,7 +402,8 @@ function render() {
            <div class="conn-popup" id="popup-${conn.id}">
              <div class="conn-popup-title">이 시기의 흐름</div>
              <span class="close-btn" onclick="closePopup('${conn.id}')">×</span>
-             <div>${conn.desc || conn.label}</div>
+             <div style="margin-bottom:10px">${conn.desc || conn.label}</div>
+             <button onclick="openConnModal(${yr})" style="font-size:11px;padding:4px 10px;border:1.5px solid var(--gray4);border-radius:4px;background:#fff;cursor:pointer;width:100%">✏️ 편집</button>
            </div>
          </div>`
       : '';
