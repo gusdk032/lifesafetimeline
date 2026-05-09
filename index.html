@@ -809,6 +809,7 @@ async function loadFromSheet() {
     if (data.conns) CONNS = data.conns;
     sortEvents();
     render();
+    saveCache();
     showToast('✅ 시트에서 불러왔습니다 (' + EVENTS.length + '건)');
   } catch(err) {
     showToast('❌ 불러오기 실패: ' + err.message);
@@ -873,11 +874,45 @@ function showToast(msg) {
 }
 
 // ══════════════════════════════════════════════════
+//  LOCAL CACHE
+// ══════════════════════════════════════════════════
+const CACHE_KEY = 'lifesafe_cache';
+
+function saveCache() {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ events: EVENTS, conns: CONNS }));
+  } catch(e) {}
+}
+
+function loadCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (data.events && data.events.length > 0) {
+      EVENTS = data.events;
+      CONNS = data.conns || [];
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+// ══════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════
-sortEvents();
-render();
-loadFromSheet(); // 페이지 열릴 때 시트 최신 데이터 자동 로드
+// 1) 캐시가 있으면 캐시(=마지막 최신버전)로 즉시 표시
+if (loadCache()) {
+  sortEvents();
+  render();
+}
+// 2) 하드코딩 데이터가 없을 경우 fallback
+else {
+  sortEvents();
+  render();
+}
+// 3) 항상 시트에서 최신 데이터 로드 (완료 후 캐시 갱신)
+loadFromSheet();
 </script>
 </body>
 </html>
