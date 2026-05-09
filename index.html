@@ -435,7 +435,16 @@ let _editingId = null;
 // ══════════════════════════════════════════════════
 //  DATE UTILS
 // ══════════════════════════════════════════════════
+function toISODate(d) {
+  if (!d) return '';
+  if (typeof d === 'string') {
+    if (d.includes('T')) d = d.slice(0, 10);  // 타임스탬프 제거
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  }
+  return String(d).slice(0, 10);
+}
 function fmtDate(d) {
+  d = toISODate(d);
   if (!d) return '';
   const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return d;
@@ -789,6 +798,8 @@ async function loadFromSheet() {
       EVENTS = data.events.map(e => ({
         ...e,
         year: +e.year,
+        date: toISODate(e.date),
+        date2: toISODate(e.date2),
         cat: Array.isArray(e.cat) ? e.cat
           : String(e.cat||'').split(',').map(s=>s.trim()).filter(Boolean),
         articles: Array.isArray(e.articles) ? e.articles : [],
