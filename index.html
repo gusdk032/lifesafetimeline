@@ -394,11 +394,11 @@ function render() {
 
   tl.innerHTML = years.map(yr => {
     const events = EVENTS.filter(e => e.year === yr);
-    const conn = CONNS.find(c => +c.from <= yr && (!c.to || +c.to >= yr));
-
+    const conn = CONNS.find(c => +c.from === yr);
+    const rangeLabel = conn && conn.to && +conn.to !== yr ? ` (~${conn.to})` : '';
     const connHtml = conn
       ? `<div class="conn-pill" data-conn="${conn.id}" style="position:relative;">
-           ↑ ${conn.label}
+           ↑ ${conn.label}${rangeLabel}
            <div class="conn-popup" id="popup-${conn.id}">
              <div class="conn-popup-title">이 시기의 흐름</div>
              <span class="close-btn" onclick="closePopup('${conn.id}')">×</span>
@@ -445,7 +445,7 @@ function render() {
       <div class="year-head">
         <div class="year-label">${yr}년</div>
         ${connHtml}
-        <button class="add-year-btn" onclick="openConnModal(${yr})">+ 흐름 추가</button>
+        ${!conn ? `<button class="add-year-btn" onclick="openConnModal(${yr})">+ 흐름 추가</button>` : ''}
         <button class="add-year-btn" onclick="openAddModal(${yr})" style="margin-left:4px">+ 사건 추가</button>
       </div>
       ${cardsHtml}
