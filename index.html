@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대한민국 생명안전의제 운동 타임라인</title>
+<style>
+:root {
+  --red:    #c0392b;
+  --red2:   #e74c3c;
+  --gray1:  #1a1a1a;
+  --gray2:  #444;
+  --gray3:  #888;
+  --gray4:  #bbb;
+  --gray5:  #e8e8e8;
+  --gray6:  #f5f5f5;
+  --white:  #fff;
+  --cat-sewol:    #c0392b;
+  --cat-disaster: #e67e22;
+  --cat-labor:    #2980b9;
+  --cat-movement: #27ae60;
+  --cat-law:      #8e44ad;
+  --shadow: 0 2px 8px rgba(0,0,0,.1);
+  --radius: 6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;color:var(--gray1);background:#fff;font-size:14px}
+a{color:inherit;text-decoration:none}
+
+/* ── HEADER ── */
+.header{padding:28px 40px 0;border-bottom:2px solid var(--gray1)}
+.header h1{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.header h1 span{color:var(--red)}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 0 10px}
+.tbtn{padding:6px 13px;border:1.5px solid var(--gray4);border-radius:20px;background:#fff;cursor:pointer;font-size:12px;font-weight:600;color:var(--gray2);transition:.15s}
+.tbtn:hover{background:var(--gray6)}
+.tbtn.active{background:var(--gray1);color:#fff;border-color:var(--gray1)}
+.tbtn.red{border-color:var(--red);color:var(--red)}
+.tbtn.red:hover{background:var(--red);color:#fff}
+.tbtn.sheet{border-color:#34a853;color:#34a853}
+.tbtn.sheet:hover{background:#34a853;color:#fff}
+.tbtn.saving{opacity:.6;pointer-events:none}
+.toolbar-right{display:flex;gap:8px;margin-left:auto}
+
+/* ── CATEGORY FILTER ── */
+.cat-bar{display:flex;align-items:center;gap:8px;padding:10px 40px;background:var(--gray6);border-bottom:1px solid var(--gray5);flex-wrap:wrap}
+.cat-bar span{font-size:11px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.cat-pill{padding:5px 14px;border-radius:20px;border:1.5px solid;cursor:pointer;font-size:12px;font-weight:700;transition:.15s;background:#fff}
+.cat-pill:hover{opacity:.8}
+.cat-pill.all{border-color:var(--gray1);color:var(--gray1)}
+.cat-pill.all.on{background:var(--gray1);color:#fff}
+.cat-pill.세월호{border-color:var(--cat-sewol);color:var(--cat-sewol)}
+.cat-pill.세월호.on{background:var(--cat-sewol);color:#fff}
+.cat-pill.재난{border-color:var(--cat-disaster);color:var(--cat-disaster)}
+.cat-pill.재난.on{background:var(--cat-disaster);color:#fff}
+.cat-pill.산업재해{border-color:var(--cat-labor);color:var(--cat-labor)}
+.cat-pill.산업재해.on{background:var(--cat-labor);color:#fff}
+.cat-pill\.운동\/조직,.cat-pill[data-cat="운동/조직"]{border-color:var(--cat-movement);color:var(--cat-movement)}
+.cat-pill[data-cat="운동/조직"].on{background:var(--cat-movement);color:#fff}
+.cat-pill[data-cat="입법/정책"]{border-color:var(--cat-law);color:var(--cat-law)}
+.cat-pill[data-cat="입법/정책"].on{background:var(--cat-law);color:#fff}
+
+/* ── MAIN LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 130px)}
+.timeline-col{flex:1;min-width:0;padding:0 40px 60px;overflow-y:auto}
+.detail-col{width:360px;flex-shrink:0;border-left:1px solid var(--gray5);position:sticky;top:0;height:calc(100vh - 130px);overflow-y:auto;background:#fff}
+.detail-col.hidden{display:none}
+
+/* ── YEAR GROUP ── */
+.year-group{margin-top:36px}
+.year-group.hidden{display:none}
+.year-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--gray1)}
+.year-label{font-size:22px;font-weight:800}
+.conn-pill{padding:4px 12px;border-radius:20px;background:var(--gray1);color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;position:relative}
+.conn-pill:hover{background:var(--red)}
+.conn-popup{position:absolute;top:calc(100% + 8px);left:0;z-index:100;background:#fff;border:1.5px solid var(--gray1);border-radius:var(--radius);padding:14px 16px;min-width:220px;max-width:320px;box-shadow:var(--shadow);font-size:13px;line-height:1.6;display:none}
+.conn-popup.open{display:block}
+.conn-popup-title{font-weight:800;margin-bottom:6px;font-size:12px;color:var(--gray3);text-transform:uppercase;letter-spacing:.4px}
+.conn-popup .close-btn{position:absolute;top:8px;right:10px;cursor:pointer;font-size:16px;color:var(--gray3)}
+.add-year-btn{padding:3px 10px;border:1.5px dashed var(--gray4);border-radius:20px;background:transparent;cursor:pointer;font-size:11px;color:var(--gray3);transition:.15s}
+.add-year-btn:hover{border-color:var(--gray2);color:var(--gray2)}
+
+/* ── EVENT CARD ── */
+.event-card{display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:0;border:1px solid var(--gray5);border-radius:var(--radius);margin-bottom:8px;cursor:pointer;transition:.15s;background:#fff}
+.event-card:hover{border-color:var(--gray3);box-shadow:var(--shadow)}
+.event-card.selected{border-color:var(--red);box-shadow:0 0 0 2px rgba(192,57,43,.15)}
+.event-card.cat-hidden{display:none}
+.ec-left{padding:14px 16px;border-right:1px solid var(--gray5)}
+.ec-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:6px}
+.ec-date{font-size:11px;color:var(--gray3);margin-bottom:8px}
+.ec-cats{display:flex;flex-wrap:wrap;gap:4px}
+.cat-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;border:1.2px solid}
+.cat-tag.세월호{border-color:var(--cat-sewol);color:var(--cat-sewol)}
+.cat-tag.재난{border-color:var(--cat-disaster);color:var(--cat-disaster)}
+.cat-tag.산업재해{border-color:var(--cat-labor);color:var(--cat-labor)}
+.cat-tag\.운동\/조직,.cat-tag[data-cat="운동/조직"]{border-color:var(--cat-movement);color:var(--cat-movement)}
+.cat-tag[data-cat="입법/정책"]{border-color:var(--cat-law);color:var(--cat-law)}
+.ec-more{font-size:11px;color:var(--red);margin-top:4px;font-weight:600}
+.ec-col{padding:14px 16px;border-right:1px solid var(--gray5);font-size:12px;line-height:1.6;color:var(--gray2)}
+.ec-col:last-child{border-right:none}
+.ec-col-label{font-size:10px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.ec-text{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ── COL HEADERS ── */
+.col-headers{display:grid;grid-template-columns:180px 1fr 1fr 1fr;gap:0;padding:6px 0 4px;border-bottom:1px solid var(--gray5);margin-bottom:6px}
+.col-hdr{padding:0 16px;font-size:10px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.5px}
+.col-hdr:first-child{color:var(--red2)}
+
+/* ── DETAIL PANEL ── */
+.dp{padding:24px 22px}
+.dp-close{float:right;cursor:pointer;font-size:18px;color:var(--gray3);line-height:1}
+.dp-close:hover{color:var(--gray1)}
+.dp-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.dp-title{font-size:18px;font-weight:800;line-height:1.3;margin-bottom:4px}
+.dp-date{font-size:12px;color:var(--gray3);margin-bottom:18px}
+.dp-section{margin-bottom:16px}
+.dp-section-title{font-size:10px;font-weight:800;color:var(--gray3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--gray5)}
+.dp-text{font-size:13px;line-height:1.7;color:var(--gray1)}
+.dp-links{display:flex;flex-direction:column;gap:4px}
+.dp-link{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--red);word-break:break-all}
+.dp-link::before{content:'↗';font-size:11px;flex-shrink:0}
+.dp-edit-btn{display:block;width:100%;padding:9px;border:1.5px solid var(--gray4);border-radius:var(--radius);background:#fff;cursor:pointer;font-size:13px;font-weight:700;color:var(--gray2);text-align:center;transition:.15s;margin-top:12px}
+.dp-edit-btn:hover{background:var(--gray1);color:#fff;border-color:var(--gray1)}
+
+/* ── EDIT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal-overlay.hidden{display:none}
+.modal{background:#fff;border-radius:10px;padding:28px 28px 20px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal-title{font-size:16px;font-weight:800;margin-bottom:20px}
+.ef-row{margin-bottom:14px}
+.ef-label{display:block;font-size:11px;font-weight:700;color:var(--gray3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.ef-input,.ef-textarea{width:100%;padding:8px 11px;border:1.5px solid var(--gray5);border-radius:var(--radius);font-size:13px;font-family:inherit;color:var(--gray1);transition:.15s}
+.ef-input:focus,.ef-textarea:focus{outline:none;border-color:var(--gray3)}
+.ef-textarea{resize:vertical;min-height:72px}
+.ef-cats{display:flex;flex-wrap:wrap;gap:8px}
+.ef-cat-cb{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:13px;font-weight:600}
+.ef-cat-cb input{cursor:pointer}
+.ef-hint{font-size:11px;color:var(--gray3);margin-top:3px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--gray5)}
+.btn-save{padding:9px 22px;background:var(--gray1);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:700;transition:.15s}
+.btn-save:hover{background:var(--red)}
+.btn-cancel{padding:9px 18px;background:#fff;color:var(--gray2);border:1.5px solid var(--gray4);border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+.btn-cancel:hover{background:var(--gray6)}
+.btn-delete{padding:9px 18px;background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;margin-right:auto;transition:.15s}
+.btn-delete:hover{background:#c0392b;color:#fff}
+
+/* ── CONN EDIT MODAL ── */
+.conn-modal{width:460px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gray1);color:#fff;padding:10px 22px;border-radius:24px;font-size:13px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── EMPTY STATE ── */
+.empty-state{padding:60px 40px;text-align:center;color:var(--gray3)}
+.empty-state p{font-size:15px;margin-bottom:12px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .detail-col{display:none}
+  .event-card{grid-template-columns:140px 1fr}
+  .ec-col:nth-child(3),.ec-col:nth-child(4){display:none}
+  .col-headers{grid-template-columns:140px 1fr}
+  .col-hdr:nth-child(3),.col-hdr:nth-child(4){display:none}
+}
+@media(max-width:600px){
+  .header{padding:20px 16px 0}
+  .cat-bar,.timeline-col{padding-left:16px;padding-right:16px}
+  .event-card{grid-template-columns:1fr}
+  .ec-col{display:none}
+  .col-headers{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>대한민국 <span>생명안전의제</span> 운동 타임라인<br><small style="font-size:14px;font-weight:500;color:var(--gray3)">1994 – 2026</small></h1>
+  <div class="toolbar">
+    <button class="tbtn active" id="view-all-btn">전체 보기</button>
+    <div class="toolbar-right">
+      <button class="tbtn sheet" id="sheet-load-btn">📥 시트에서 불러오기</button>
+      <button class="tbtn sheet" id="sheet-save-btn">☁️ 시트에 저장</button>
+      <button class="tbtn" id="exp-btn">↓ JSON 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="cat-bar">
+  <span>카테고리</span>
+  <button class="cat-pill all on" data-cat="all">전체</button>
+  <button class="cat-pill 세월호" data-cat="세월호">세월호</button>
+  <button class="cat-pill 재난" data-cat="재난">재난</button>
+  <button class="cat-pill 산업재해" data-cat="산업재해">산업재해</button>
+  <button class="cat-pill" data-cat="운동/조직">운동/조직</button>
+  <button class="cat-pill" data-cat="입법/정책">입법/정책</button>
+</div>
+
+<div class="layout">
+  <div class="timeline-col" id="timeline-col">
+    <div class="col-headers">
+      <div class="col-hdr">대표 사건</div>
+      <div class="col-hdr">배경 및 경과</div>
+      <div class="col-hdr">쟁점과 의의</div>
+      <div class="col-hdr">시민사회 대응·결과·입법</div>
+    </div>
+    <div id="timeline"></div>
+  </div>
+  <div class="detail-col hidden" id="detail-col">
+    <div class="dp" id="detail-panel"></div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal" id="edit-modal">
+    <div class="modal-title" id="modal-title">새 사건 추가</div>
+    <input type="hidden" id="ef-id">
+    <div class="ef-row">
+      <label class="ef-label">날짜 <span style="font-weight:400;color:var(--gray3)">(시작일)</span></label>
+      <input class="ef-input" id="ef-date" type="date">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">종료 날짜 <span style="font-weight:400;color:var(--gray3)">(기간 사건만)</span></label>
+      <input class="ef-input" id="ef-date2" type="date">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">제목</label>
+      <input class="ef-input" id="ef-title" type="text" placeholder="사건 제목">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">카테고리 <span style="font-weight:400;color:var(--gray3)">(복수 선택 가능)</span></label>
+      <div class="ef-cats">
+        <label class="ef-cat-cb"><input type="checkbox" value="세월호"> 세월호</label>
+        <label class="ef-cat-cb"><input type="checkbox" value="재난"> 재난</label>
+        <label class="ef-cat-cb"><input type="checkbox" value="산업재해"> 산업재해</label>
+        <label class="ef-cat-cb"><input type="checkbox" value="운동/조직"> 운동/조직</label>
+        <label class="ef-cat-cb"><input type="checkbox" value="입법/정책"> 입법/정책</label>
+      </div>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">배경 및 경과</label>
+      <textarea class="ef-textarea" id="ef-event" placeholder="사건 배경, 원인, 경과"></textarea>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">쟁점과 의의</label>
+      <textarea class="ef-textarea" id="ef-issue" placeholder="주요 쟁점, 사회적 의의"></textarea>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">시민사회 대응</label>
+      <textarea class="ef-textarea" id="ef-civil" placeholder="시민사회, 피해자 운동, 연대 활동"></textarea>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">결과·입법</label>
+      <textarea class="ef-textarea" id="ef-result" placeholder="제도 변화, 입법 결과, 판결 등"></textarea>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">관련 기사 URL</label>
+      <textarea class="ef-textarea" id="ef-articles" rows="2" placeholder="줄바꿈으로 구분해서 입력"></textarea>
+      <div class="ef-hint">여러 개는 줄바꿈으로 구분</div>
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">관련 자료집 URL</label>
+      <textarea class="ef-textarea" id="ef-docs" rows="2" placeholder="줄바꿈으로 구분해서 입력"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-delete" id="btn-delete" style="display:none">삭제</button>
+      <button class="btn-cancel" id="btn-cancel">취소</button>
+      <button class="btn-save" id="btn-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONN Edit Modal -->
+<div class="modal-overlay hidden" id="conn-modal-overlay">
+  <div class="modal conn-modal" id="conn-modal">
+    <div class="modal-title">연도 흐름 편집</div>
+    <input type="hidden" id="cm-id">
+    <div class="ef-row">
+      <label class="ef-label">시작 연도</label>
+      <input class="ef-input" id="cm-from" type="number" placeholder="예: 2014">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">종료 연도 <span style="font-weight:400;color:var(--gray3)">(선택)</span></label>
+      <input class="ef-input" id="cm-to" type="number" placeholder="예: 2016">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">흐름 설명 라벨</label>
+      <input class="ef-input" id="cm-label" type="text" placeholder="예: 피해자 입법 주체화 모델">
+    </div>
+    <div class="ef-row">
+      <label class="ef-label">상세 내용 <span style="font-weight:400;color:var(--gray3)">(팝업에 표시)</span></label>
+      <textarea class="ef-textarea" id="cm-desc" rows="4" placeholder="이 시기의 흐름, 특징 등을 설명해주세요"></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-delete" id="cm-delete" style="display:none">삭제</button>
+      <button class="btn-cancel" id="cm-cancel">취소</button>
+      <button class="btn-save" id="cm-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════════════
+const SHEET_API = 'PASTE_YOUR_GAS_URL_HERE';
+
+const CATS = ['세월호','재난','산업재해','운동/조직','입법/정책'];
+
+// ══════════════════════════════════════════════════
+//  INITIAL DATA
+// ══════════════════════════════════════════════════
+let EVENTS = [
+  {id:'1994-성수대교',year:1994,date:'1994-10-21',title:'성수대교 붕괴',cat:['재난'],
+   event:'서울 성동구 성수다리 부실 시공·유지관리 부재로 붕괴. 32명 사망.',
+   issue:'시설물의 안전관리에 관한 특별법 제정(1995). 시설안전기술공단 설립.',
+   civil:'시민들의 충격 속 공공 시설물 안전 점검 요구.',
+   result:'시설물 안전 관리 특별법 제정, 교량 정기 점검 도입.',articles:[],docs:[]},
+  {id:'1995-대구가스',year:1995,date:'1995-04-28',title:'대구 상인동 도시가스 폭발',cat:['재난'],
+   event:'대구 달서구 상인동 지하 공사 현장 안전 관리 부재로 도시가스 폭발. 101명 사망.',
+   issue:'지하 공사 안전 관리 강화 필요.',
+   civil:'야외 공연을 보기 위해 지나던 학생 다수 희생.',
+   result:'지하철 공사 안전관리 규정 개정.',articles:[],docs:[]},
+  {id:'1995-삼풍',year:1995,date:'1995-06-29',title:'삼풍백화점 붕괴',cat:['재난'],
+   event:'서울 서초구 삼풍백화점 붕괴. 502명 사망, 937명 부상. 한국 최대 인명 피해 건물 붕괴 사고.',
+   issue:'부실 시공·불법 구조 변경·관리 부재. 건설업 감리 강화 필요.',
+   civil:'전국민 충격. 안전 재난관리법 제정(1995).',
+   result:'건축법·소방법 개정. 건설업 감리 강화. 이삼수 회장 등 징역형 선고.',articles:[],docs:[]},
+  {id:'1999-씨랜드',year:1999,date:'1999-06-30',title:'씨랜드 청소년수련원 화재',cat:['재난'],
+   event:'경기도 화성 씨랜드 어린이 생명 보호 시설 화재. 23명 사망(대부분 유치원생).',
+   issue:'청소년 안전시설 안전기준 강화 필요. 샌드위치패널 문제.',
+   civil:'어린이 안전시설 전반 점검 요구.',
+   result:'청소년수련시설 안전기준 강화. 이후 2020년 의정부 화재까지 반복.',articles:[],docs:[]},
+  {id:'2003-대구지하철',year:2003,date:'2003-02-18',title:'대구지하철 화재 참사',cat:['재난'],
+   event:'대구 중앙로역 지하철 화재. 192명 사망. 방화 및 초기 대응 실패.',
+   issue:'대규모 피해자 조직. 도시철도 불연화 기준 전면 강화.',
+   civil:'재난 및 안전관리 기본법 제정(2004). 소방방재청 출범(2004).',
+   result:'지하철 불연재 교체. 안전 기준 대폭 강화.',articles:[],docs:[]},
+  {id:'2008-이천냉동',year:2008,date:'2008-01-07',title:'이천 냉동창고 화재',cat:['산업재해'],
+   event:'경기도 이천 코리아냉동 냉동창고 건설 현장 화재. 40명 사망(외국인 노동자 포함).',
+   issue:'하청·재하청 구조 안전 사각지대. 공사 감리 부재.',
+   civil:'건설현장 안전 문제 집중 조명. 2020년 동일 유형 반복 비판.',
+   result:'건설현장 화재 예방 기준 일부 강화.',articles:[],docs:[]},
+  {id:'2011-가습기살균제',year:2011,date:'2011-08-01',title:'가습기살균제 피해 최초 보고',cat:['재난','산업재해'],
+   event:'원인불명 폐 손상 6건 화학물질 사전 독성 검증 의무 부재. 피해 은폐.',
+   issue:'소비자 안전 규제 공백. 기업 책임 회피.',
+   civil:'피해자 가족 네트워크 구성(2012). 옥시 불매운동(2016). 사회적 참사특별조사위원회 조사 대상.',
+   result:'가습기살균제 피해구제 특별법 제정(2017). 사회적 참사특별조사위원회 출범(2017). 생활화학제품 안전관리법 제정(2018).',articles:[],docs:[]},
+  {id:'2014-세월호',year:2014,date:'2014-04-16',title:'세월호 참사',cat:['세월호','재난'],
+   event:'진도 앞바다 세월호 침몰. 304명 사망·실종. 구조 실패, 국가 책임 논란.',
+   issue:'이전의 생명안전은 개인에게 경고되는 말이었으나 이제 국가와 자본이 이윤·효율보다 시민의 생명과 안전을 최우선으로 해야 한다는 패러다임의 전환.',
+   civil:'노란리본. 희생자 추모와 미수습자 귀환 전국민 연대. 유가족과 시민들은 진상규명·책임자 처벌·독립 조사기구 설치를 요구하며 서명운동·단식농성·도보행진.',
+   result:'2014.11.07. 세월호참사 특별법 통과. 2014.11.19. 대통령 공포. 4.16세월호참사 특별조사위원회 출범.',
+   articles:['https://www.416commission.go.kr'],docs:[]},
+  {id:'2014-판교환풍구',year:2014,date:'2014-10-17',title:'판교 환풍구 붕괴',cat:['재난'],
+   event:'성남 판교 테크노밸리 야외공연 중 환풍구 붕괴. 16명 사망.',
+   issue:'공연 안전 관리 부재. 건축물 설비 기준의 허점.',
+   civil:'안전 시설물에 대한 공공 인식 제고.',
+   result:'건축물 설비 기준 규정 개정. 환풍구 덮개 하중 기준 및 안전펜스 설치 의무 강화.',articles:[],docs:[]},
+  {id:'2015-가족협의회',year:2015,date:'2015-01-25',title:'4.16 피해자 가족협의회 발족',cat:['세월호','운동/조직'],
+   event:'(사)4.16세월호참사 가족협의회 결성. 피해 당사자 조직화.',
+   issue:'세월호 이후 지속적 진상규명 요구와 안전사회 건설을 위한 피해 당사자 조직화 필요.',
+   civil:'피해자 가족이 운동 주체로 조직화. 4.16인권선언 제정운동 및 전국 풀뿌리 토론회.',
+   result:'4.16인권선언 제정운동 및 전국 풀뿌리 토론회.',articles:[],docs:[]},
+  {id:'2015-추자도',year:2015,date:'2015-09-05',title:'추자도 돌고래호 전복',cat:['재난'],
+   event:'세월호참사 1년여. 제주 추자도 인근 낚시어선 돌고래호 전복. 15명 사망.',
+   issue:'세월호 이후에도 빈 제도 개선이 현장에 해당 안전 관리 논의 지속.',
+   civil:'세월호 유가족 등 연대 성명.',
+   result:'낚시어선 안전기준 강화 논의.',articles:[],docs:[]},
+  {id:'2015-의정부화재',year:2015,date:'2015-01-10',title:'의정부 도시형 생활주택 화재',cat:['재난'],
+   event:'의정부 도시형 생활주택 화재. 5명 사망. 드라이비트 외벽 문제 재부각.',
+   issue:'이명박 정부 도시화 규제 완화 정책과 6층 이상 건축물 스프링클러 설치 의무화 논란.',
+   civil:'주차장 화재가 건물 전체로 번짐. 드라이비트 외벽 불연 기준 강화 요구.',
+   result:'6층 이상 건축물 스프링클러 설치 의무화. 외벽 불연성 재료 기준 강화 등 건축법 개정.',articles:[],docs:[]},
+  {id:'2016-구의역',year:2016,date:'2016-05-28',title:'구의역 스크린도어 사망사고',cat:['산업재해'],
+   event:'서울 구의역 9-4 승강장 19세 외주 노동자 혼자 스크린도어 수리 중 열차에 치여 사망.',
+   issue:'개인이 아닌 기업 산재를 개인의 실수로 돌리는 구조.',
+   civil:'구의역 9-4 포스트 서울시, 지하철 안전업무 하청→서울교통공사 직접고용 전환.',
+   result:'2인 1조 매뉴얼 실질적 작동 도전. 도급제 개선 논의.',articles:[],docs:[]},
+  {id:'2016-이한빛',year:2016,date:'2016-10-26',title:'tvN 이한빛 PD 사망',cat:['산업재해'],
+   event:'tvN 이한빛 PD 과로 사망. 방송 업계 장시간 노동 구조 폭로.',
+   issue:'구조적 폭력을 개인 책임으로 돌리는 방송 산업 문화.',
+   civil:'방송 정규직 노동자 연대. 가족대책모임으로.',
+   result:'2017년 6월 CJENM 공식 사과. 책임인정. 재발방지대책 합의(적정근로시간 보장, 직장 내 괴롭힘 방지 등).',articles:[],docs:[]},
+  {id:'2017-스텔라데이지',year:2017,date:'2017-03-31',title:'스텔라데이지호 침몰',cat:['재난'],
+   event:'남대서양 스텔라데이지호 침몰. 22명 실종.',
+   issue:'해외 바다에서 화물 심해수색 비용 문제.',
+   civil:'단일선체 유조선 → 벌크선 구조 전환 안전 미비.',
+   result:'문재인 정부는 대응 2019년 국회 공청회에서 2차 심해수색 필요 결론 → 예산 미편성으로 무산.',articles:[],docs:[]},
+  {id:'2017-집배원',year:2017,date:'2017-07-06',title:'집배노동자 과로사·과로자살',cat:['산업재해'],
+   event:'2017년 9월 5일 집배원 수 명이 과로사·자살. 근본 원인 집중 조명.',
+   issue:'과로사 해결, 국민적 우편 안전 서비스 논의.',
+   civil:'집배원 과로사해결 정규인력 2천명 증원을 골자로 7대 권고안 담은 〈집배원 노동조건실태 및 개선방안〉보고서.',
+   result:'우정사업본부 개선 논의.',articles:[],docs:[]},
+  {id:'2017-삼성반도체',year:2017,date:'2017-08-01',title:'삼성반도체 직업병 대법원 판결',cat:['산업재해','입법/정책'],
+   event:'2007년 황유미 백혈병 이후 10년 집단 투쟁. 삼성반도체 직업병 대법원 판결.',
+   issue:'반도체 등 첨단산업 직업병 인과관계 입증 어려움.',
+   civil:'삼성반도체 고 황유미 사망사건 이후 투쟁으로 2018년 7월 삼성전자와 중재 합의.',
+   result:'삼성반도체 고 황유미 사망사건. 2017년 3월 말 거치와 동시 세월호 법적 지위 상실.',articles:[],docs:[]},
+  {id:'2018-김용균',year:2018,date:'2018-12-10',title:'태안화력 김용균 노동자 사망',cat:['산업재해'],
+   event:'태안화력발전소 24세 비정규직 노동자 홀로 야간 작업 중 컨베이어벨트에 끼어 사망.',
+   issue:'비정규직 구조, 위험의 외주화.',
+   civil:'김용균재단 설립. 중대재해기업처벌법 제정 운동 본격화 계기.',
+   result:'산업안전보건법 전면 개정(2019). 중대재해처벌법 제정(2021) 계기.',articles:['https://yongkyun.nodong.org'],docs:[]},
+  {id:'2019-중대재해법운동',year:2019,date:'2019-01-01',title:'중대재해기업처벌법 제정 운동 본격화',cat:['운동/조직','입법/정책'],
+   event:'김용균 사망 이후 중대재해기업처벌법 제정 운동 본격화. 노동단체·시민사회 연대.',
+   issue:'기업 책임 법제화.',
+   civil:'중대재해기업처벌법 제정연대 출범.',
+   result:'2021년 1월 중대재해처벌법 국회 통과.',articles:[],docs:[]},
+  {id:'2020-이천화재',year:2020,date:'2020-04-29',title:'이천 한익스프레스 화재',cat:['산업재해'],
+   event:'경기 이천 한익스프레스 물류창고 화재. 38명 사망. 2008년 이천 냉동창고 화재 반복.',
+   issue:'하청 노동자 안전 문제 반복. 건설 현장 안전관리 실패.',
+   civil:'2008년 이천 사고 유족과 연대.',
+   result:'건설현장 화재 예방 기준 강화 논의.',articles:[],docs:[]},
+  {id:'2021-중대재해법제정',year:2021,date:'2021-01-26',title:'중대재해처벌법 제정',cat:['입법/정책'],
+   event:'중대재해처벌법 국회 통과. 기업 경영자 처벌 가능.',
+   issue:'법 적용 범위(50인 미만 유예), 처벌 수위 논란.',
+   civil:'노동계는 환영하면서도 적용 범위 확대 요구.',
+   result:'2022년 1월 27일 시행(50인 이상). 2024년 1월 27일 전면 시행.',articles:[],docs:[]},
+  {id:'2022-중대재해법시행',year:2022,date:'2022-01-27',title:'중대재해처벌법 시행',cat:['입법/정책'],
+   event:'중대재해처벌법 50인 이상 사업장 시행.',
+   issue:'실제 처벌 효과 논란. 하청 구조 내 책임 귀속 문제.',
+   civil:'노동계 전면 시행 요구 지속.',
+   result:'초기 수사·기소 사례 축적.',articles:[],docs:[]},
+];
+
+let CONNS = [];
+let _selectedId = null;
+let _filterCat = 'all';
+let _editingId = null;
+
+// ══════════════════════════════════════════════════
+//  DATE UTILS
+// ══════════════════════════════════════════════════
+function fmtDate(d) {
+  if (!d) return '';
+  const m = d.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return d;
+  if (m[3] === '01' && m[2] === '01') return m[1] + '년';
+  if (m[3] === '01') return m[1] + '.' + m[2] + '.';
+  return m[1] + '.' + m[2] + '.' + m[3] + '.';
+}
+function fmtDateRange(d, d2) {
+  return d2 ? fmtDate(d) + ' ~ ' + fmtDate(d2) : fmtDate(d);
+}
+function sortKey(e) {
+  return (e.date || (e.year + '-01-01') || '0000-01-01');
+}
+
+// ══════════════════════════════════════════════════
+//  CAT HELPERS
+// ══════════════════════════════════════════════════
+function catClass(c) {
+  if (c === '운동/조직') return 'cat-movement';
+  if (c === '입법/정책') return 'cat-law';
+  return c;
+}
+function catTagHtml(c) {
+  return `<span class="cat-tag" data-cat="${c}" style="${catStyle(c)}">${c}</span>`;
+}
+function catStyle(c) {
+  const map = {
+    '세월호': 'border-color:var(--cat-sewol);color:var(--cat-sewol)',
+    '재난': 'border-color:var(--cat-disaster);color:var(--cat-disaster)',
+    '산업재해': 'border-color:var(--cat-labor);color:var(--cat-labor)',
+    '운동/조직': 'border-color:var(--cat-movement);color:var(--cat-movement)',
+    '입법/정책': 'border-color:var(--cat-law);color:var(--cat-law)',
+  };
+  return map[c] || '';
+}
+
+// ══════════════════════════════════════════════════
+//  SORT
+// ══════════════════════════════════════════════════
+function sortEvents() {
+  EVENTS.sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
+}
+
+// ══════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════
+function render() {
+  sortEvents();
+  const tl = document.getElementById('timeline');
+  const years = [...new Set(EVENTS.map(e => e.year))].sort((a,b) => a-b);
+
+  tl.innerHTML = years.map(yr => {
+    const events = EVENTS.filter(e => e.year === yr);
+    const conn = CONNS.find(c => +c.from <= yr && (!c.to || +c.to >= yr));
+
+    const connHtml = conn
+      ? `<div class="conn-pill" data-conn="${conn.id}" style="position:relative;">
+           ↑ ${conn.label}
+           <div class="conn-popup" id="popup-${conn.id}">
+             <div class="conn-popup-title">이 시기의 흐름</div>
+             <span class="close-btn" onclick="closePopup('${conn.id}')">×</span>
+             <div>${conn.desc || conn.label}</div>
+           </div>
+         </div>`
+      : '';
+
+    const cardsHtml = events.map(e => {
+      const cats = Array.isArray(e.cat) ? e.cat : [e.cat];
+      const matchFilter = _filterCat === 'all' || cats.includes(_filterCat);
+      const hiddenCls = matchFilter ? '' : 'cat-hidden';
+      const selCls = e.id === _selectedId ? 'selected' : '';
+      const catTags = cats.map(c => catTagHtml(c)).join('');
+      const moreEvent = (e.event||'').length > 80;
+      return `<div class="event-card ${hiddenCls} ${selCls}" data-id="${e.id}" onclick="selectEvent('${e.id}')">
+        <div class="ec-left">
+          <div class="ec-title">${e.title}</div>
+          <div class="ec-date">${fmtDateRange(e.date, e.date2)}</div>
+          <div class="ec-cats">${catTags}</div>
+        </div>
+        <div class="ec-col">
+          <div class="ec-col-label">배경·경과</div>
+          <div class="ec-text">${e.event||''}</div>
+          ${moreEvent ? '<div class="ec-more">▸ 전체 보기</div>' : ''}
+        </div>
+        <div class="ec-col">
+          <div class="ec-col-label">쟁점과 의의</div>
+          <div class="ec-text">${e.issue||''}</div>
+        </div>
+        <div class="ec-col">
+          <div class="ec-col-label">시민사회·결과·입법</div>
+          <div class="ec-text">${(e.civil||'') + (e.result ? ' ' + e.result : '')}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const groupHidden = _filterCat !== 'all' && !events.some(e => {
+      const cats = Array.isArray(e.cat) ? e.cat : [e.cat];
+      return cats.includes(_filterCat);
+    }) ? 'hidden' : '';
+
+    return `<div class="year-group ${groupHidden}" id="yg-${yr}">
+      <div class="year-head">
+        <div class="year-label">${yr}년</div>
+        ${connHtml}
+        <button class="add-year-btn" onclick="openConnModal(${yr})">+ 흐름 추가</button>
+        <button class="add-year-btn" onclick="openAddModal(${yr})" style="margin-left:4px">+ 사건 추가</button>
+      </div>
+      ${cardsHtml}
+    </div>`;
+  }).join('');
+
+  // add final "새 연도 추가" block
+  tl.innerHTML += `<div style="margin-top:28px;padding-top:20px;border-top:1px dashed var(--gray4)">
+    <button class="add-year-btn" onclick="openAddModal(null)" style="font-size:13px;padding:6px 16px">+ 새 사건 추가</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  SELECT EVENT → DETAIL PANEL
+// ══════════════════════════════════════════════════
+function selectEvent(id) {
+  _selectedId = id;
+  render();
+  const e = EVENTS.find(ev => ev.id === id);
+  if (!e) return;
+  const col = document.getElementById('detail-col');
+  const panel = document.getElementById('detail-panel');
+  col.classList.remove('hidden');
+  const cats = Array.isArray(e.cat) ? e.cat : [e.cat];
+  const catTags = cats.map(c => catTagHtml(c)).join('');
+  const linksHtml = (arr, icon) => arr && arr.length
+    ? arr.map(u => `<a class="dp-link" href="${u}" target="_blank">${icon} ${u}</a>`).join('')
+    : '';
+
+  panel.innerHTML = `
+    <span class="dp-close" onclick="closeDetail()">×</span>
+    <div class="dp-cats">${catTags}</div>
+    <div class="dp-title">${e.title}</div>
+    <div class="dp-date">${fmtDateRange(e.date, e.date2)}</div>
+    ${section('배경 및 경과', e.event)}
+    ${section('쟁점과 의의', e.issue)}
+    ${section('시민사회 대응', e.civil)}
+    ${section('결과·입법', e.result)}
+    ${(e.articles && e.articles.length) ? `<div class="dp-section"><div class="dp-section-title">관련 기사</div><div class="dp-links">${linksHtml(e.articles,'📰')}</div></div>` : ''}
+    ${(e.docs && e.docs.length) ? `<div class="dp-section"><div class="dp-section-title">관련 자료집</div><div class="dp-links">${linksHtml(e.docs,'📄')}</div></div>` : ''}
+    <button class="dp-edit-btn" onclick="openEditModal('${e.id}')">✏️ 편집</button>
+  `;
+}
+function section(title, text) {
+  if (!text) return '';
+  return `<div class="dp-section">
+    <div class="dp-section-title">${title}</div>
+    <div class="dp-text">${text}</div>
+  </div>`;
+}
+function closeDetail() {
+  _selectedId = null;
+  document.getElementById('detail-col').classList.add('hidden');
+  render();
+}
+
+// ══════════════════════════════════════════════════
+//  CONN POPUP
+// ══════════════════════════════════════════════════
+function closePopup(id) {
+  document.getElementById('popup-' + id)?.classList.remove('open');
+}
+document.addEventListener('click', e => {
+  const pill = e.target.closest('.conn-pill');
+  if (pill) {
+    e.stopPropagation();
+    const connId = pill.dataset.conn;
+    const popup = document.getElementById('popup-' + connId);
+    if (popup) popup.classList.toggle('open');
+    return;
+  }
+  document.querySelectorAll('.conn-popup.open').forEach(p => p.classList.remove('open'));
+});
+
+// ══════════════════════════════════════════════════
+//  CATEGORY FILTER
+// ══════════════════════════════════════════════════
+document.querySelectorAll('.cat-pill').forEach(btn => {
+  btn.addEventListener('click', () => {
+    _filterCat = btn.dataset.cat;
+    document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    render();
+  });
+});
+
+// ══════════════════════════════════════════════════
+//  EDIT MODAL
+// ══════════════════════════════════════════════════
+function openAddModal(year) {
+  _editingId = null;
+  document.getElementById('modal-title').textContent = '새 사건 추가';
+  document.getElementById('ef-id').value = '';
+  document.getElementById('ef-date').value = year ? year + '-01-01' : '';
+  document.getElementById('ef-date2').value = '';
+  document.getElementById('ef-title').value = '';
+  document.getElementById('ef-event').value = '';
+  document.getElementById('ef-issue').value = '';
+  document.getElementById('ef-civil').value = '';
+  document.getElementById('ef-result').value = '';
+  document.getElementById('ef-articles').value = '';
+  document.getElementById('ef-docs').value = '';
+  document.querySelectorAll('.ef-cat-cb input').forEach(cb => cb.checked = false);
+  document.getElementById('btn-delete').style.display = 'none';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.getElementById('ef-date').focus();
+}
+function openEditModal(id) {
+  const e = EVENTS.find(ev => ev.id === id);
+  if (!e) return;
+  _editingId = id;
+  document.getElementById('modal-title').textContent = '사건 편집';
+  document.getElementById('ef-id').value = e.id;
+  document.getElementById('ef-date').value = e.date || '';
+  document.getElementById('ef-date2').value = e.date2 || '';
+  document.getElementById('ef-title').value = e.title || '';
+  document.getElementById('ef-event').value = e.event || '';
+  document.getElementById('ef-issue').value = e.issue || '';
+  document.getElementById('ef-civil').value = e.civil || '';
+  document.getElementById('ef-result').value = e.result || '';
+  document.getElementById('ef-articles').value = (e.articles || []).join('\n');
+  document.getElementById('ef-docs').value = (e.docs || []).join('\n');
+  const cats = Array.isArray(e.cat) ? e.cat : [e.cat];
+  document.querySelectorAll('.ef-cat-cb input').forEach(cb => {
+    cb.checked = cats.includes(cb.value);
+  });
+  document.getElementById('btn-delete').style.display = 'block';
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+document.getElementById('btn-cancel').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+document.getElementById('btn-save').addEventListener('click', () => {
+  const date = document.getElementById('ef-date').value;
+  const title = document.getElementById('ef-title').value.trim();
+  if (!date || !title) { showToast('날짜와 제목은 필수입니다'); return; }
+
+  const cats = [...document.querySelectorAll('.ef-cat-cb input:checked')].map(cb => cb.value);
+  if (!cats.length) { showToast('카테고리를 하나 이상 선택해주세요'); return; }
+
+  const year = parseInt(date.slice(0, 4));
+  const id = _editingId || (date.slice(0,4) + '-' + title.slice(0,6).replace(/\s/g,'')).replace(/[^\w가-힣-]/g,'');
+
+  const ev = {
+    id, year, date,
+    date2: document.getElementById('ef-date2').value || undefined,
+    title,
+    cat: cats,
+    event: document.getElementById('ef-event').value.trim(),
+    issue: document.getElementById('ef-issue').value.trim(),
+    civil: document.getElementById('ef-civil').value.trim(),
+    result: document.getElementById('ef-result').value.trim(),
+    articles: document.getElementById('ef-articles').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    docs: document.getElementById('ef-docs').value.split('\n').map(s=>s.trim()).filter(Boolean),
+  };
+  if (!ev.date2) delete ev.date2;
+
+  if (_editingId) {
+    const idx = EVENTS.findIndex(e => e.id === _editingId);
+    if (idx >= 0) EVENTS[idx] = ev;
+  } else {
+    EVENTS.push(ev);
+  }
+  sortEvents();
+  closeModal();
+  render();
+  if (_editingId) selectEvent(ev.id);
+  showToast('저장됐습니다');
+});
+
+document.getElementById('btn-delete').addEventListener('click', () => {
+  if (!_editingId) return;
+  if (!confirm('이 사건을 삭제할까요?')) return;
+  EVENTS = EVENTS.filter(e => e.id !== _editingId);
+  closeModal();
+  closeDetail();
+  render();
+  showToast('삭제됐습니다');
+});
+
+// ══════════════════════════════════════════════════
+//  CONN MODAL
+// ══════════════════════════════════════════════════
+function openConnModal(year) {
+  const existing = CONNS.find(c => +c.from === year);
+  document.getElementById('cm-id').value = existing ? existing.id : '';
+  document.getElementById('cm-from').value = year || '';
+  document.getElementById('cm-to').value = existing ? (existing.to || '') : '';
+  document.getElementById('cm-label').value = existing ? existing.label : '';
+  document.getElementById('cm-desc').value = existing ? (existing.desc || '') : '';
+  document.getElementById('cm-delete').style.display = existing ? 'block' : 'none';
+  document.getElementById('conn-modal-overlay').classList.remove('hidden');
+}
+document.getElementById('cm-cancel').addEventListener('click', () => {
+  document.getElementById('conn-modal-overlay').classList.add('hidden');
+});
+document.getElementById('conn-modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('conn-modal-overlay'))
+    document.getElementById('conn-modal-overlay').classList.add('hidden');
+});
+document.getElementById('cm-save').addEventListener('click', () => {
+  const from = document.getElementById('cm-from').value;
+  const label = document.getElementById('cm-label').value.trim();
+  if (!from || !label) { showToast('시작 연도와 라벨은 필수입니다'); return; }
+  const conn = {
+    id: document.getElementById('cm-id').value || ('conn-' + from),
+    from: +from,
+    to: document.getElementById('cm-to').value ? +document.getElementById('cm-to').value : null,
+    label,
+    desc: document.getElementById('cm-desc').value.trim(),
+  };
+  const idx = CONNS.findIndex(c => c.id === conn.id || +c.from === +from);
+  if (idx >= 0) CONNS[idx] = conn;
+  else CONNS.push(conn);
+  document.getElementById('conn-modal-overlay').classList.add('hidden');
+  render();
+  showToast('흐름이 저장됐습니다');
+});
+document.getElementById('cm-delete').addEventListener('click', () => {
+  const id = document.getElementById('cm-id').value;
+  CONNS = CONNS.filter(c => c.id !== id);
+  document.getElementById('conn-modal-overlay').classList.add('hidden');
+  render();
+  showToast('흐름이 삭제됐습니다');
+});
+
+// ══════════════════════════════════════════════════
+//  SHEET API
+// ══════════════════════════════════════════════════
+async function loadFromSheet() {
+  if (SHEET_API === 'PASTE_YOUR_GAS_URL_HERE') {
+    showToast('⚠️ Apps Script URL을 설정해주세요');
+    return;
+  }
+  try {
+    showToast('📊 시트에서 불러오는 중...');
+    const res = await fetch(SHEET_API);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (data.events && data.events.length > 0) {
+      EVENTS = data.events.map(e => ({
+        ...e,
+        year: +e.year,
+        cat: Array.isArray(e.cat) ? e.cat
+          : String(e.cat||'').split(',').map(s=>s.trim()).filter(Boolean),
+        articles: Array.isArray(e.articles) ? e.articles : [],
+        docs: Array.isArray(e.docs) ? e.docs : [],
+      }));
+    }
+    if (data.conns) CONNS = data.conns;
+    sortEvents();
+    render();
+    showToast('✅ 시트에서 불러왔습니다 (' + EVENTS.length + '건)');
+  } catch(err) {
+    showToast('❌ 불러오기 실패: ' + err.message);
+  }
+}
+
+async function saveToSheet() {
+  if (SHEET_API === 'PASTE_YOUR_GAS_URL_HERE') {
+    showToast('⚠️ Apps Script URL을 설정해주세요');
+    return;
+  }
+  const btn = document.getElementById('sheet-save-btn');
+  btn.textContent = '☁️ 저장 중...';
+  btn.classList.add('saving');
+  try {
+    const payload = {
+      events: EVENTS.map(e => ({
+        ...e,
+        cat: Array.isArray(e.cat) ? e.cat.join(',') : (e.cat || '')
+      })),
+      conns: CONNS
+    };
+    const res = await fetch(SHEET_API, { method: 'POST', body: JSON.stringify(payload) });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    showToast('✅ 시트에 저장됐습니다 (' + data.saved + '건)');
+  } catch(err) {
+    showToast('❌ 저장 실패: ' + err.message);
+  } finally {
+    btn.textContent = '☁️ 시트에 저장';
+    btn.classList.remove('saving');
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  JSON EXPORT
+// ══════════════════════════════════════════════════
+document.getElementById('exp-btn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({events: EVENTS, conns: CONNS}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'lifesafe-timeline.json';
+  a.click();
+});
+
+// ══════════════════════════════════════════════════
+//  SHEET BUTTONS
+// ══════════════════════════════════════════════════
+document.getElementById('sheet-load-btn').addEventListener('click', loadFromSheet);
+document.getElementById('sheet-save-btn').addEventListener('click', saveToSheet);
+
+// ══════════════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════════════
+let _toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+sortEvents();
+render();
+</script>
+</body>
+</html>
